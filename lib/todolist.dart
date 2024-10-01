@@ -17,7 +17,7 @@ class _TodoListExpState extends State<TodoListExp> {
     Colors.purple,
     Colors.yellow
   ];
-  List<String> nameList=[];
+  List<String> _items=[];
 
    void initState(){
     super.initState();
@@ -27,7 +27,7 @@ class _TodoListExpState extends State<TodoListExp> {
     
     SharedPreferences prefs=await SharedPreferences.getInstance();
     setState(() {
-      nameList=prefs.getStringList("items")?? [];
+      _items=prefs.getStringList("items") ?? [];
     });
   }
 saveItems(List<String>items)async{
@@ -37,14 +37,15 @@ saveItems(List<String>items)async{
 
   void addItem (String item){
 setState(() {
-  nameList.add(item);
+  _items.add(item);
 
 });
-saveItems(nameList);
+saveItems(_items);
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue[100],
       appBar: AppBar(
         title: Text("TO DO LIST"),
       ),
@@ -55,7 +56,7 @@ saveItems(nameList);
           children: [
            Expanded(child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: nameList.length,
+            itemCount: _items.length,
             itemBuilder: (context ,index){
 
               return Container(
@@ -63,7 +64,11 @@ saveItems(nameList);
              width: double.infinity,
              
              
-             child: Center(child: Text(nameList[index])),
+             child: Center(child: Row(
+               children: [
+                 Text(_items[index]),
+               ],
+             )),
               );
             }))
             
@@ -74,55 +79,59 @@ saveItems(nameList);
               showModalBottomSheet(context: context, builder: (BuildContext context){
                 return Container(
                 height: 300,
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    TextField(
-                  
-                  
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "ENTER TASK"
+                
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    
+                    children: [
+                      TextField(
+                    
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: "ENTER TASK"
+                    ),
+                    
                   ),
-                  
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Text("Choose a Color"),
-              Expanded(
-                child: Column(
-                  children: [
-                   Expanded(
-                     child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder:(context ,index){
-                      
-                      return CircleAvatar(
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text("Choose a Color"),
+                                Expanded(
+                  child: Column(
+                    children: [
+                     Expanded(
+                       child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder:(context ,index){
                         
-                        radius: 30,
-                      backgroundColor: colorList[index],
+                        return CircleAvatar(
+                          
+                          radius: 30,
+                        backgroundColor: colorList[index],
+                         
                        
-                     
-                      );
-                     }, separatorBuilder: (context,index){
-                      return SizedBox(width: 5,);
-                     
-                     }, itemCount: 5),
-                   )
-                  ],
-                ),
-              ),
-              ElevatedButton(onPressed: (){
-                if(_controller.text.isNotEmpty){
-                  addItem(_controller.text);
-                  _controller.clear();
-                  Navigator.pop(context);
-                }
-              }, child: Text("ADD"))
-              
-                  ],
-                  
+                        );
+                       }, separatorBuilder: (context,index){
+                        return SizedBox(width: 5,);
+                       
+                       }, itemCount: colorList.length),
+                     )
+                    ],
+                  ),
+                                ),
+                                TextButton(onPressed: (){
+                  if(_controller.text.isNotEmpty){
+                    addItem(_controller.text);
+                    _controller.clear();
+                    Navigator.pop(context);
+                  }
+                                }, child: Text("ADD"))
+                                
+                    ],
+                    
+                  ),
                 )
                 
                 
